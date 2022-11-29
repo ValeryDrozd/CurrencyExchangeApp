@@ -21,7 +21,7 @@ const exchangeCurrency = (
   baseCurrencyRate: number,
   destCurrencyRate: number
 ) => {
-  return (value * baseCurrencyRate) / destCurrencyRate;
+  return (value * destCurrencyRate) / baseCurrencyRate;
 };
 
 export const CurrencyExchange = ({
@@ -47,18 +47,23 @@ export const CurrencyExchange = ({
       [InputType.Dest]: [setDestCurrencyValue, setBaseCurrencyValue],
     };
 
+    const mapRate = {
+      [InputType.Base]: [
+        currencyRate.rates[baseCurrency],
+        currencyRate.rates[destCurrency],
+      ],
+      [InputType.Dest]: [
+        currencyRate.rates[destCurrency],
+        currencyRate.rates[baseCurrency],
+      ],
+    };
+
     const [setBaseInput, setDestInput] = mapSetFuncs[inputType];
+    const [baseRate, destRate] = mapRate[inputType];
     setBaseInput(value);
     setDestInput(
       !isNaN(floatValue)
-        ? round(
-            exchangeCurrency(
-              floatValue,
-              currencyRate.rates[baseCurrency],
-              currencyRate.rates[destCurrency]
-            ),
-            4
-          ).toString()
+        ? round(exchangeCurrency(floatValue, baseRate, destRate), 4).toString()
         : ""
     );
   };
